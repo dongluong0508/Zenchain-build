@@ -31,31 +31,29 @@
       btn.addEventListener("click", async (e) => {
         e.preventDefault();
 
-        // Lấy giá từ sản phẩm (vd: "2ztc")
-        const priceText = btn.closest(".box").querySelector(".price").textContent.trim();
-        const amountZtc = parseFloat(priceText.replace(/[^0-9.]/g, "")); // chỉ lấy số
+        // Lấy giá hiện tại (giá bên ngoài, không lấy trong <span>)
+        const priceElement = btn.closest(".box").querySelector(".price");
+        const currentPriceText = priceElement.childNodes[0].textContent.trim(); 
+        // ví dụ: "2ztc"
+
+        const amountZtc = parseFloat(currentPriceText.replace(/[^0-9.]/g, "")); 
 
         if (amountZtc <= 0 || isNaN(amountZtc)) {
-          alert("⚠️ Số lượng ZTC không hợp lệ!");
+          alert("⚠️ Invalid ZTC amount!");
           return;
         }
 
-        // Quy định: 1 ZTC = 0.0001 ETH
-        const ethEquivalent = amountZtc * 0.0001;
-
         if (typeof window.ethereum === "undefined") {
-          alert("⚠️ Vui lòng cài đặt MetaMask để thanh toán!");
+          alert("⚠️ Please install MetaMask to pay!");
           return;
         }
 
         try {
           // Kiểm tra mạng hiện tại
           const chainIdHex = await window.ethereum.request({ method: "eth_chainId" });
-          // ZenChain testnet chain id là 0x20d8 (hex) tương đương 8408 decimal
-          const targetChainIdHex = "0x20d8";
+          const targetChainIdHex = "0x20d8"; // ZenChain testnet = 8408
 
           if (chainIdHex !== targetChainIdHex) {
-            // Yêu cầu thêm hoặc chuyển sang ZenChain Testnet
             try {
               await window.ethereum.request({
                 method: "wallet_addEthereumChain",
@@ -72,27 +70,26 @@
                 }]
               });
             } catch (addError) {
-              console.error("Lỗi khi thêm/chuyển mạng:", addError);
-              alert("⚠️ Không thể chuyển sang ZenChain Testnet! Vui lòng kiểm tra MetaMask.");
+              console.error("Error adding/switching network:", addError);
+              alert("⚠️ Unable to switch to ZenChain Testnet! Please check MetaMask.");
               return;
             }
-
           }
 
-          // Sau khi chắc chắn là trên mạng đúng
+          // Lấy tài khoản người dùng
           const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
           if (!accounts || accounts.length === 0) {
-            alert("⚠️ Không tìm thấy tài khoản nào trong MetaMask.");
+            alert("⚠️ No accounts found in MetaMask.");
             return;
           }
           const account = accounts[0];
           const web3 = new Web3(window.ethereum);
 
-          // Địa chỉ ví nhận tiền testnet ZenChain
+          // Địa chỉ ví nhận tiền trên testnet ZenChain
           const merchantAddress = "0x6E1823435d0200FBae665497a432db12b5fA10E9";
 
-          // Tính value bằng toWei, chuỗi "ether" (vì đơn vị 18 decimals)
-          const valueWei = web3.utils.toWei(ethEquivalent.toString(), "ether");
+          // Tính value bằng ZTC (18 decimals giống ETH)
+          const valueWei = web3.utils.toWei(amountZtc.toString(), "ether");
 
           // Gửi giao dịch
           const tx = await web3.eth.sendTransaction({
@@ -101,11 +98,11 @@
             value: valueWei,
           });
 
-          alert("✅ Thanh toán thành công!\nTx Hash: " + tx.transactionHash);
+          alert("✅ Payment successful!\nTx Hash: " + tx.transactionHash);
 
         } catch (err) {
-          console.error("Lỗi thanh toán:", err);
-          alert("❌ Thanh toán thất bại: " + (err.message || err));
+          console.error("Payment error:", err);
+          alert("❌ Payment failed: " + (err.message || err));
         }
 
       });
@@ -115,7 +112,6 @@
 
 <body>
 <!--header section starts-->
-/* tải logo và các biểu tượng và tiện ích */
 <header>
 
     <input type="checkbox" name="" id="toggler">
@@ -185,7 +181,7 @@
 <section class="icons-container">
 
     <div class="icons">
-        <img src="images/icon-1.png" alt="">
+        <img src="images/icon2/3.jpg" alt="">
         <div class="info">
             <h3>Free Delivery</h3>
             <span>On all Orders</span>
@@ -193,7 +189,7 @@
     </div>
 
     <div class="icons">
-        <img src="images/icon-2.png" alt="">
+        <img src="images/icon2/hh.jpg" alt="">
         <div class="info">
             <h3>10 days returns</h3>
             <span>Moneyback Guarantee</span>
@@ -201,7 +197,7 @@
     </div>
 
     <div class="icons">
-        <img src="images/icon-3.png" alt="">
+        <img src="images/icon2/qt.jpg" alt="">
         <div class="info">
             <h3>Offer & Gifts</h3>
             <span>On all Orders</span>
@@ -209,7 +205,7 @@
     </div>
 
     <div class="icons">
-        <img src="images/icon-4.png" alt="">
+        <img src="images/icon2/zen.jpg" alt="">
         <div class="info">
             <h3>Secure Payments</h3>
             <span>Protected by ZenChain</span>
