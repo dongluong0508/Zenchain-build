@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative products of the Zenchain community</title>
+
+    <!--font awesome cdn link-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <!--custom cass file--> 
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<!--code style-->
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Zen Font</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+</html>
+
+<!--thanh toán-->
+<!-- Web3.js để kết nối ví -->
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const cartButtons = document.querySelectorAll(".cart-btn");
+
+    cartButtons.forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        // Lấy giá từ sản phẩm (vd: "2ztc")
+        const priceText = btn.closest(".box").querySelector(".price").textContent.trim();
+        const amountZtc = parseFloat(priceText.replace(/[^0-9.]/g, "")); // chỉ lấy số
+
+        if (amountZtc <= 0 || isNaN(amountZtc)) {
+          alert("⚠️ Số lượng ZTC không hợp lệ!");
+          return;
+        }
+
+        // Quy định: 1 ZTC = 0.0001 ETH
+        const ethEquivalent = amountZtc * 0.0001;
+
+        if (typeof window.ethereum === "undefined") {
+          alert("⚠️ Vui lòng cài đặt MetaMask để thanh toán!");
+          return;
+        }
+
+        try {
+          // Kiểm tra mạng hiện tại
+          const chainIdHex = await window.ethereum.request({ method: "eth_chainId" });
+          // ZenChain testnet chain id là 0x20d8 (hex) tương đương 8408 decimal
+          const targetChainIdHex = "0x20d8";
+
+          if (chainIdHex !== targetChainIdHex) {
+            // Yêu cầu thêm hoặc chuyển sang ZenChain Testnet
+            try {
+              await window.ethereum.request({
+                method: "wallet_addEthereumChain",
+                params: [{
+                  chainId: targetChainIdHex,
+                  chainName: "ZenChain Testnet",
+                  nativeCurrency: {
+                    name: "ZenChain ZTC",
+                    symbol: "ZTC",
+                    decimals: 18
+                  },
+                  rpcUrls: ["https://zenchain-testnet.api.onfinality.io/public"],
+                  blockExplorerUrls: ["https://zentrace.io"]
+                }]
+              });
+            } catch (addError) {
+              console.error("Lỗi khi thêm/chuyển mạng:", addError);
+              alert("⚠️ Không thể chuyển sang ZenChain Testnet! Vui lòng kiểm tra MetaMask.");
+              return;
+            }
+
+          }
+
+          // Sau khi chắc chắn là trên mạng đúng
+          const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+          if (!accounts || accounts.length === 0) {
+            alert("⚠️ Không tìm thấy tài khoản nào trong MetaMask.");
+            return;
+          }
+          const account = accounts[0];
+          const web3 = new Web3(window.ethereum);
+
+          // Địa chỉ ví nhận tiền testnet ZenChain
+          const merchantAddress = "0x6E1823435d0200FBae665497a432db12b5fA10E9";
+
+          // Tính value bằng toWei, chuỗi "ether" (vì đơn vị 18 decimals)
+          const valueWei = web3.utils.toWei(ethEquivalent.toString(), "ether");
+
+          // Gửi giao dịch
+          const tx = await web3.eth.sendTransaction({
+            from: account,
+            to: merchantAddress,
+            value: valueWei,
+          });
+
+          alert("✅ Thanh toán thành công!\nTx Hash: " + tx.transactionHash);
+
+        } catch (err) {
+          console.error("Lỗi thanh toán:", err);
+          alert("❌ Thanh toán thất bại: " + (err.message || err));
+        }
+
+      });
+    });
+  });
+</script>
+
+<body>
+<!--header section starts-->
+/* tải logo và các biểu tượng và tiện ích */
+<header>
+
+    <input type="checkbox" name="" id="toggler">
+    <label for="toggler" class="fas fa-bars"></label>
+
+
+    <a href="#" class="logo">ZENCHAIN<span>.</span></a>
+
+    <nav class="navbar">
+        <a href="#Home">Home</a>
+        <a href="#About">About</a>
+        <a href="#Products">Products</a>
+        <a href="#Review">Review</a>
+        <a href="#Contact">Contact</a>
+    </nav>
+
+    <div class="icons">
+        <a href="#" class="fas fa-heart"></a>
+        <a href="#" class="fas fa-shopping-cart"></a>
+        <a href="#" class="fas fa-user"></a>
+    </div>
+
+</header>
+<!-- header section ends-->
+
+<!--home section starts-->
+
+<!--Lời giới thiệu-->
+<section class="home" id="home">
+
+    <div class="content">
+        <h3>Zenchain Community</h3>
+        <span>Photos and Objects</span>
+        <p>Right here all your works are recorded by Zanchain. They are all huge contributions to us. All of them have a huge value.</p>
+        <a href="#" class="btn">Right now</a>
+    </div>
+
+</section>
+
+<!--home section ends-->
+
+<!--about section starts-->
+
+<!--video giới thiệu về Zenchain-->
+<section class="about" id="about">
+
+    <h1 class="heading"> About <span> Us </span> </h1>
+
+    <div class="row">
+
+        <div class="video-container">
+            <video src="images/video gioi thieu.mp4" loop autoplay muted></video>
+            <!--<h3>best seller</h3>-->    
+        </div>
+        <div class="content">
+            <h3>Why choose us?</h3>
+            <p>ZenChain – High-speed, transparent and secure blockchain platform, creating sustainable value for the digital future. Invest in ZenChain – Advanced Web3 infrastructure, opening up long-term growth opportunities.</p>
+            <p>ZenChain – Fast, cheap, secure, connecting everyone in the Web3 world. With ZenChain – Easily experience, create and develop in the blockchain era.</p>
+            <a href="#" class="btn">Learn more</a>
+        </div>
+    </div>
+</section>
+<!--about section ends-->
+
+<!--icons section starts--> 
+<!--tải hình ảnh công cụ thanh toán-->
+<section class="icons-container">
+
+    <div class="icons">
+        <img src="images/icon-1.png" alt="">
+        <div class="info">
+            <h3>Free Delivery</h3>
+            <span>On all Orders</span>
+        </div>
+    </div>
+
+    <div class="icons">
+        <img src="images/icon-2.png" alt="">
+        <div class="info">
+            <h3>10 days returns</h3>
+            <span>Moneyback Guarantee</span>
+        </div>
+    </div>
+
+    <div class="icons">
+        <img src="images/icon-3.png" alt="">
+        <div class="info">
+            <h3>Offer & Gifts</h3>
+            <span>On all Orders</span>
+        </div>
+    </div>
+
+    <div class="icons">
+        <img src="images/icon-4.png" alt="">
+        <div class="info">
+            <h3>Secure Payments</h3>
+            <span>Protected by ZenChain</span>
+        </div>
+    </div>
+
+</section>
+
+<!--icons section ends-->
+
+<!--products section starts-->
+
+<section class="products" id="products">
+
+    <h1 class="heading"> Latest <span>Products</span> </h1>
+
+    <div class="box-container">
+
+        <!-- Box 1 -->
+        <div class="box">
+            <span class="discount">-3%</span>
+            <div class="image">
+                <img src="images/sp/tranh 6.webp" alt="Individual artwork">
+                <div class="icons">
+                    <a href="#" class="fas fa-heart"></a>
+                    <a href="#" class="cart-btn">Add To Cart</a>
+                    <a href="#" class="fas fa-share"></a>
+                </div>
+            </div>
+            <div class="content">
+                <h3>Individual artwork</h3>
+                <div class="price">2ztc <span>5ztc</span></div>
+            </div>
+        </div>
+
+        <!-- Box 2 -->
+        <div class="box">
+            <span class="discount">-5%</span>
+            <div class="image">
+                <img src="images/sp/tranh 7.webp" alt="Individual artwork">
+                <div class="icons">
+                    <a href="#" class="fas fa-heart"></a>
+                    <a href="#" class="cart-btn">Add To Cart</a>
+                    <a href="#" class="fas fa-share"></a>
+                </div>
+            </div>
+            <div class="content">
+                <h3>Individual artwork</h3>
+                <div class="price">3ztc <span>5ztc</span></div>
+            </div>
+        </div>
+
+        <!-- Box 3 -->
+        <div class="box">
+            <span class="discount">-6%</span>
+            <div class="image">
+                <img src="images/sp/tranh 8.webp" alt="Individual artwork">
+                <div class="icons">
+                    <a href="#" class="fas fa-heart"></a>
+                    <a href="#" class="cart-btn">Add To Cart</a>
+                    <a href="#" class="fas fa-share"></a>
+                </div>
+            </div>
+            <div class="content">
+                <h3>Individual artwork</h3>
+                <div class="price">1ztc <span>2ztc</span></div>
+            </div>
+        </div>
+
+        <!-- Box 4 -->
+        <div class="box">
+            <span class="discount">-15%</span>
+            <div class="image">
+                <img src="images/sp/tranh.webp" alt="Individual artwork">
+                <div class="icons">
+                    <a href="#" class="fas fa-heart"></a>
+                    <a href="#" class="cart-btn">Add To Cart</a>
+                    <a href="#" class="fas fa-share"></a>
+                </div>
+            </div>
+            <div class="content">
+                <h3>Individual artwork</h3>
+                <div class="price">10ztc <span>12ztc</span></div>
+            </div>
+        </div>
+
+        <!-- Box 5 -->
+        <div class="box">
+            <span class="discount">-11%</span>
+            <div class="image">
+                <img src="images/sp/tranh 1.webp" alt="Individual artwork">
+                <div class="icons">
+                    <a href="#" class="fas fa-heart"></a>
+                    <a href="#" class="cart-btn">Add To Cart</a>
+                    <a href="#" class="fas fa-share"></a>
+                </div>
+            </div>
+            <div class="content">
+                <h3>Individual artwork</h3>
+                <div class="price">3ztc <span>4ztc</span></div>
+            </div>
+        </div>
+
+        <!-- Box 6 -->
+        <div class="box">
+            <span class="discount">-5%</span>
+            <div class="image">
+                <img src="images/sp/tranh 2.webp" alt="Individual artwork">
+                <div class="icons">
+                    <a href="#" class="fas fa-heart"></a>
+                    <a href="#" class="cart-btn">Add To Cart</a>
+                    <a href="#" class="fas fa-share"></a>
+                </div>
+            </div>
+            <div class="content">
+                <h3>Individual artwork</h3>
+                <div class="price">2ztc <span>3ztc</span></div>
+            </div>
+        </div>
+
+        <!-- Box 7 -->
+        <div class="box">
+            <span class="discount">-7%</span>
+            <div class="image">
+                <img src="images/sp/tranh 3.webp" alt="Individual artwork">
+                <div class="icons">
+                    <a href="#" class="fas fa-heart"></a>
+                    <a href="#" class="cart-btn">Add To Cart</a>
+                    <a href="#" class="fas fa-share"></a>
+                </div>
+            </div>
+            <div class="content">
+                <h3>Individual artwork</h3>
+                <div class="price">10ztc <span>12ztc</span></div>
+            </div>
+        </div>
+
+        <!-- Box 8 -->
+        <div class="box">
+            <span class="discount">-4%</span>
+            <div class="image">
+                <img src="images/sp/tranh 4.webp" alt="Individual artwork">
+                <div class="icons">
+                    <a href="#" class="fas fa-heart"></a>
+                    <a href="#" class="cart-btn">Add To Cart</a>
+                    <a href="#" class="fas fa-share"></a>
+                </div>
+            </div>
+            <div class="content">
+                <h3>Individual artwork</h3>
+                <div class="price">3ztc <span>4ztc</span></div>
+            </div>
+        </div>
+
+        <!-- Box 9 -->
+        <div class="box">
+            <span class="discount">-4%</span>
+            <div class="image">
+                <img src="images/sp/tranh 5.webp" alt="Individual artwork">
+                <div class="icons">
+                    <a href="#" class="fas fa-heart"></a>
+                    <a href="#" class="cart-btn">Add To Cart</a>
+                    <a href="#" class="fas fa-share"></a>
+                </div>
+            </div>
+            <div class="content">
+                <h3>Individual artwork</h3>
+                <div class="price">3ztc <span>4ztc</span></div>
+            </div>
+        </div>
+
+        <!-- Box 10 -->
+        <div class="box">
+            <span class="discount">-5%</span>
+            <div class="image">
+                <img src="images/sp/tranh12.jfif" alt="Individual artwork">
+                <div class="icons">
+                    <a href="#" class="fas fa-heart"></a>
+                    <a href="#" class="cart-btn">Add To Cart</a>
+                    <a href="#" class="fas fa-share"></a>
+                </div>
+            </div>
+            <div class="content">
+                <h3>Individual artwork</h3>
+                <div class="price">3ztc <span>4ztc</span></div>
+            </div>
+        </div>
+
+        <!-- Box 11 -->
+        <div class="box">
+            <span class="discount">-4%</span>
+            <div class="image">
+                <img src="images/sp/tranh11.jfif" alt="Individual artwork">
+                <div class="icons">
+                    <a href="#" class="fas fa-heart"></a>
+                    <a href="#" class="cart-btn">Add To Cart</a>
+                    <a href="#" class="fas fa-share"></a>
+                </div>
+            </div>
+            <div class="content">
+                <h3>Individual artwork</h3>
+                <div class="price">6ztc <span>7ztc</span></div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!--products section ends-->
+
+<!--review section starts-->    
+
+<section class="review" id="review">
+
+  <h1 class="heading"> Customer's <span> Review </span> </h1>
+
+  <div class="box-container">
+
+    <!-- review 1 -->
+    <div class="box">
+      <div class="stars">
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star-half-alt"></i>
+      </div>
+      <p>Truly unique creative works.</p>
+      <div class="user">
+        <img src="images/user/1.jpg" alt="">
+        <div class="user-info">
+          <h3>dong luong</h3>
+          <span>Happy Customer</span>
+        </div>
+      </div>
+      <span class="fas fa-quote"></span>
+    </div>
+
+    <!-- review 2 -->
+    <div class="box">
+      <div class="stars">
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star-half-alt"></i>
+      </div>
+      <p>My children are very interested. How wonderful.</p>
+      <div class="user">
+        <img src="images/user/2.jpg" alt="">
+        <div class="user-info">
+          <h3>Tuan Anh</h3>
+          <span>Happy Customer</span>
+        </div>
+      </div>
+      <span class="fas fa-quote"></span>
+    </div>
+
+    <!-- review 3 -->
+    <div class="box">
+      <div class="stars">
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star-half-alt"></i>
+      </div>
+      <p>Unbelievable, they can draw by hand.</p>
+      <div class="user">
+        <img src="images/user/3.jpg" alt="">
+        <div class="user-info">
+          <h3>Adam</h3>
+          <span>Happy Customer</span>
+        </div>
+      </div>
+      <span class="fas fa-quote"></span>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!--review section ends-->  
+<!--thanh to-->
+    
+</body>
+</html>
